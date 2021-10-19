@@ -1,8 +1,9 @@
 /* eslint-disable no-console */
 /* eslint-disable no-unused-vars */
-import { Sequelize, Model, Datatypes } from 'sequelize';
-import Credentials from '../credentials';
+// import { Sequelize, Model, Datatypes } from 'sequelize';
+// import Credentials from '../credentials';
 
+const Sequelize = require('sequelize');
 // const user = 'josh';
 // const host = 'localhost';
 // const database = '<Reviews>';
@@ -26,9 +27,25 @@ const sequelize = new Sequelize('Reviews', 'josh', {
   },
 });
 
-try {
-  await sequelize.authenticate();
-  console.log('Connection has been established successfully.');
-} catch (error) {
-  console.error('Unable to connect to the database:', error);
-}
+
+// try {
+//   await sequelize.authenticate();
+//   console.log('Connection has been established successfully.');
+// } catch (error) {
+//   console.error('Unable to connect to the database:', error);
+// }
+
+db.sequelize.authenticate()
+  .then({
+    console.log('Connection has been established successfully.');
+  })
+  .catch({
+    console.error('Unable to connect to the database:', error);
+  });
+
+const db = {};
+
+db.Sequelize = Sequelize;
+db.sequelize = sequelize;
+
+module.exports = db;
