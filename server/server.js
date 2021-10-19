@@ -2,13 +2,10 @@
 /* eslint-disable import/extensions */
 /* eslint-disable no-unused-vars */
 /* eslint-disable import/no-unresolved */
-
 const express = require('express');
-const db = require('/Users/josh/Documents/Galvanize/RPP30/SDC/ReviewsAPI/database/database.js');
-
-// const credentials = require('credentials.js');
 const app = express();
 const port = 3000;
+const sequelize = require('./../database/db.js');
 
 app.use(express.static('Public'));
 app.use(express.json());
@@ -18,19 +15,18 @@ app.get('/', (req, res) => {
   res.json('Server is running...');
 });
 
-// db.sequelize.sync();
-
-console.log('test')
-
-// db.sequelize.authenticate()
-//   .then({
-//     console.log('Connection has been established successfully.')
-//   })
-//   .catch({
-//     console.error('Unable to connect to the database:', error);
-//   });
-
-
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
+
+async function dbTest() {
+  try {
+    await sequelize.authenticate();
+    console.log('Connection has been established successfully.');
+  } catch (error) {
+    console.error('Unable to connect to the database:', error);
+  }
+}
+dbTest();
+
+
