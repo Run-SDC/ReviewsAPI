@@ -2,7 +2,10 @@
   "scripts": {
     "lint": "eslint ./",
     "test": "jest",
-    "server": "nodemon ./Server/server.js"
+    "server": "nodemon ./Server/server.js",
+    "dbStart": "brew services start postgresql",
+    "dbStop": "brew services stop postgresql",
+    "dbLogin": "psql postgres"
   },
   "dependencies": {
     "babel": "^6.23.0",
