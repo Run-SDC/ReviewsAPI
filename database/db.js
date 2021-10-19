@@ -5,7 +5,7 @@ const sequelize = new Sequelize({
   dialect: 'postgres',
   password: '',
   user: 'josh',
-  port: 3000,
+  port: 5432,
   database: 'test'
 });
 
