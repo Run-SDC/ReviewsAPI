@@ -1,7 +1,7 @@
 {
   "scripts": {
     "lint": "eslint ./",
-    "test": "jest",
+    "test": "jest --coverage",
     "server": "nodemon ./Server/server.js",
     "dbStart": "brew services start postgresql",
     "dbStop": "brew services stop postgresql",

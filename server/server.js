@@ -16,24 +16,35 @@ app.get('/', (req, res) => {
 });
 
 
-app.get('/reviews' (req, res) => {
+app.get('/reviews/', (req, res) => {
   //helper function from db to pull reviews for a given product
+
+  res.status(200).send(req.params)
 })
 
-app.get('/meta' (req, res) => {
+app.get('/meta', (req, res) => {
   //helper function from db to pull meta data for a products reviews
+  res.status(200).send('pinged reviews/meta router')
+
 })
 
-app.post('/reviews' (req, res) => {
+app.post('/reviews', (req, res) => {
   //helper function from db to add new entry
+  res.status(200).send('pinged reviews POST router')
+
 })
 
-app.put('/helpful' (req, res) => {
+app.put('/reviews/:review_id/helpful', (req, res) => {
   //helper function from db to update entry helpfulness field
+  let hi = req.params;
+  res.status(200).send('pinged reviews helpful router', req.query)
+
 })
 
-app.put('/report' (req, res) => {
+app.put('/reviews/:review_id/report', (req, res) => {
   //helper function from db to flag review
+  res.status(200).send('pinged reviews report router')
+
 })
 
 app.listen(port, () => {
