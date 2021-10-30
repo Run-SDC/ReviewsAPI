@@ -1,6 +1,18 @@
-//import sequelize
+const db = require('./db.js');
 
 const getReviews = function() {
+  db.Reviews.findAll({
+    where: {
+      id: 2
+    }
+  })
+    .then((res) => {
+      console.log(res);
+      return res;
+    })
+    .catch((err) => {
+      console.log(err);
+    })
   return 'getReviews';
 };
 

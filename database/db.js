@@ -6,15 +6,9 @@ const sequelize = new Sequelize({
   password: '',
   user: 'josh',
   port: 5432,
-  database: 'test'
+  database: 'reviews',
+  logging: false
 });
-
-
-var User = sequelize.define('user', {
-  username: Sequelize.STRING,
-  birthday: Sequelize.DATE
-});
-
 
 const Reviews = sequelize.define('reviews', {
   id: {type: Sequelize.INTEGER, primaryKey: true},
@@ -80,17 +74,5 @@ const CharacteristicVals = sequelize.define('characteristic_reviews', {
   value: Sequelize.INTEGER,
 });
 
-//EXAMPLE FROM DOCS
-// sequelize.sync().then(function() {
-//   return User.create({
-//     username: 'janedoe',
-//     birthday: new Date(1980, 6, 20)
-//   });
-// }).then(function(jane) {
-//   console.log(jane.get({
-//     plain: true
-//   }));
-// });
 
-
-module.exports = sequelize;
+module.exports = {sequelize, Reviews, Photos, Characteristics, CharacteristicVals};
