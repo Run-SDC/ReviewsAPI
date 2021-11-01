@@ -5,8 +5,9 @@
 const express = require('express');
 const app = express();
 const port = 3000;
-const sequelize = require('./../database/db.js');
-const db = require('./../database/queries.js');
+const query = require('./../database/queries');
+const db = require('./../database/db');
+const dbTwo = require('./../database/dbTwo');
 
 app.use(express.static('Public'));
 app.use(express.json());
@@ -17,29 +18,22 @@ app.get('/', (req, res) => {
 });
 
 app.get('/reviews/', (req, res) => {
-  //helper function from db to pull reviews for a given product
-  //account for pages, count per page, and sort by "newest, helpful, relevant"
-  console.log(db.getReviews());
-  res.status(200).send('pinged reviews router')
 
-  db.getReviews()
-  .then((reviews) => {
-    res.status(200).json(reviews)
-    return
+  dbTwo.test((data) => {
+    console.log("data from server file", data);
+    res.status(200).json(data)
+
   })
-  .catch((err) => {
-    throw error
-    res.status(500).json('Server error', error)
-  })
+
 })
 
 app.get('/meta', (req, res) => {
   //helper function from db to pull meta data for a products reviews
-  console.log(db.getMeta());
+  console.log(query.getMeta());
 
   res.status(200).send('pinged reviews/meta router')
 
-  db.getMeta()
+  query.getMeta()
   .then((metaData) => {
     res.status(200).json(metaData)
     return
@@ -55,9 +49,9 @@ app.post('/reviews', (req, res) => {
   //helper function from db to add new entry
 
   //pass req params to helper fx
-  console.log(db.postReview());
+  console.log(query.postReview());
 
-  db.postReview()
+  query.postReview()
     .then((reviews) => {
       res.status(201).json("CREATED");
       return
@@ -73,10 +67,10 @@ app.post('/reviews', (req, res) => {
 
 app.put('/reviews/:review_id/helpful', (req, res) => {
   //helper function from db to update entry helpfulness field
-  console.log(db.putHelpful());
+  console.log(query.putHelpful());
   res.status(204);
 
-  db.putHelpful()
+  query.putHelpful()
   .then(() => {
     res.status(204);
     return
@@ -90,11 +84,11 @@ app.put('/reviews/:review_id/helpful', (req, res) => {
 
 app.put('/reviews/:review_id/report', (req, res) => {
   //helper function from db to flag review
-  console.log(db.reportReview());
+  console.log(query.reportReview());
 
   res.status(200).send('pinged reviews report router')
 
-  db.postReview()
+  query.postReview()
   .then(() => {
     res.status(204)
     return
@@ -111,7 +105,7 @@ app.listen(port, () => {
 
 async function dbTest() {
   try {
-    await sequelize.authenticate();
+    await db.sequelize.authenticate();
     console.log('Connection has been established successfully.');
   } catch (error) {
     console.error('Unable to connect to the database:', error);
@@ -119,4 +113,4 @@ async function dbTest() {
 }
 dbTest();
 
-
+module.exports = app;
