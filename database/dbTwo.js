@@ -28,16 +28,18 @@ const pool = new Pool({
 
 // };
 
-let test = function(cb) {
+let test = function(options, cb) {
+
+  //take options obj arg to structure query
+
+
   pool.query(`SELECT * FROM reviews WHERE id = 1`, (err, res) => {
     if (err) {
       console.log('SELECT pool.query() Error:', err)
-      return err
+      cb(err, null);
     }
     if (res) {
-      console.log('SELECT pool.query():', res.rows[0])
-      cb(res.rows[0]);
-      return res;
+      cb(null, res.rows[0]);
     }
   })
 }

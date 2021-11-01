@@ -19,12 +19,25 @@ app.get('/', (req, res) => {
 
 app.get('/reviews/', (req, res) => {
 
-  dbTwo.test((data) => {
-    console.log("data from server file", data);
-    res.status(200).json(data)
+  //pull id a page parameters into options obj
 
+  let queryOptions = {
+    productId: req.query.product_id,
+    count: req.query.count,
+    page: req.query.page,
+    sort: req.query.sort
+  }
+
+  console.log("parameters", queryOptions);
+
+  dbTwo.test(queryOptions, (err, data) => {
+    if (err) {
+      res.status(500).json("Error retrieving review data.")
+    } else {
+      console.log("data from server file", data);
+      res.status(200).json(data)
+    }
   })
-
 })
 
 app.get('/meta', (req, res) => {
