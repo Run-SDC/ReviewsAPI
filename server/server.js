@@ -56,55 +56,64 @@ app.get('/meta', (req, res) => {
 
 app.post('/reviews', (req, res) => {
   //helper function from db to add new entry
+  let reviewData = req.body;
+  console.log(reviewData);
+  //DATA FROM CLIENT
+  // const params = {
+  //   // eslint-disable-next-line camelcase
+  //   product_id: S.productID,
+  //   rating: S.rating,
+  //   summary: S.summary,
+  //   body: S.body,
+  //   recommend: S.recommend,
+  //   name: S.name,
+  //   email: S.email,
+  //   photos: S.photosForServer,
+  //   characteristics: S.characteristics
+  // };
 
-  //pass req params to helper fx
-  console.log(query.postReview());
-
-  query.postReview()
-    .then((reviews) => {
-      res.status(201).json("CREATED");
-      return
-    })
-    .catch((err) => {
-      throw error
-      res.status(500).json('Server error', error)
-    })
-
-  res.status(200).send('pinged reviews POST router')
-
+  // db.postReview(req.body, (err, data) => {
+  //   if (err) {
+  //     throw error;
+  //     res.status(500).json("Error updating review.")
+  //   } else {
+  //     console.log("Successfully added review");
+  //     res.status(204).json('CREATED')
+  //   }
+  // })
 })
 
 app.put('/reviews/:review_id/helpful', (req, res) => {
-  //helper function from db to update entry helpfulness field
-  console.log(query.putHelpful());
-  res.status(204);
 
-  query.putHelpful()
-  .then(() => {
-    res.status(204);
-    return
-  })
-  .catch((err) => {
-    throw error
-    res.status(500).json('Server error', error)
+  let queryOptions = {
+    reviewId: req.params.review_id,
+  }
+
+  db.putHelpful(queryOptions, (err, data) => {
+    if (err) {
+      throw error;
+      res.status(500).json("Error updating review.")
+    } else {
+      console.log("Successfully marked review as helpful");
+      res.status(204).json('NO CONTENT')
+    }
   })
 
 })
 
 app.put('/reviews/:review_id/report', (req, res) => {
-  //helper function from db to flag review
-  console.log(query.reportReview());
+  let queryOptions = {
+    reviewId: req.params.review_id,
+  }
 
-  res.status(200).send('pinged reviews report router')
-
-  query.postReview()
-  .then(() => {
-    res.status(204)
-    return
-  })
-  .catch((err) => {
-    throw error
-    res.status(500).json('Server error', error)
+  db.reportReview(queryOptions, (err, data) => {
+    if (err) {
+      throw error;
+      res.status(500).json("Error reporting review.")
+    } else {
+      console.log("Successfully reported review");
+      res.status(204).json('NO CONTENT')
+    }
   })
 })
 

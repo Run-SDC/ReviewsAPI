@@ -13,15 +13,16 @@ const pool = new Pool({
 
 const getReviews = function(options, cb) {
   //use options obj arg to structure query
+  let join = `SELECT * FROM review_photos
+  RIGHT JOIN reviews ON review_photos.review_id = reviews.review_id
+  WHERE reviews.product_id = ${options.productId}`
 
-  // `SELECT ${columns} FROM reviews
-  // INNER JOIN review_photos ON review_photos.review_id = reviews.review_id
-  // WHERE reviews.product_id = ${options.productId}`
+  let reviews = `SELECT reported FROM reviews WHERE review_id = 4`
+  let photos
 
-  let columns = 'reviews.review_id, rating, date, summary, body, recommend, reported, reviewer_name, response, helpfulness'
+  let index = 'CREATE INDEX idx_reviews_id ON review_photos(review_id)'
 
-  pool.query(`SELECT * FROM review_photos
-    WHERE review_photos.review_id = 5`, (err, res) => {
+  pool.query(reviews, (err, res) => {
       if (err) {
       console.log('SELECT pool.query() Error:', err)
       cb(err, null);
@@ -53,15 +54,45 @@ const getMeta = function(options, cb) {
 };
 
 const postReview = function(options, cb) {
-  return 'postReview';
+  // let report = `UPDATE reviews SET helpfulness = helpfulness + 1 WHERE review_id = ${options.reviewId}`
+
+  pool.query(report, (err, res) => {
+    if (err) {
+    console.log(`Error updating report status for review ${options.reviewId}:`, err)
+    cb(err, null);
+    }
+    if (res) {
+      cb(null, res);
+    }
+  })
 };
 
 const putHelpful = function(options, cb) {
-  return 'putHelpful';
+  let report = `UPDATE reviews SET helpfulness = helpfulness + 1 WHERE review_id = ${options.reviewId}`
+
+  pool.query(report, (err, res) => {
+    if (err) {
+    console.log(`Error updating report status for review ${options.reviewId}:`, err)
+    cb(err, null);
+    }
+    if (res) {
+      cb(null, res);
+    }
+  })
 };
 
 const reportReview = function(options, cb) {
-  return 'reportReview';
+  let report = `UPDATE reviews SET reported = true WHERE review_id = ${options.reviewId}`
+
+  pool.query(report, (err, res) => {
+    if (err) {
+    console.log(`Error updating report status for review ${options.reviewId}:`, err)
+    cb(err, null);
+    }
+    if (res) {
+      cb(null, res);
+    }
+  })
 };
 
-module.exports = {getReviews};
+module.exports = {getReviews, reportReview, putHelpful, postReview};
