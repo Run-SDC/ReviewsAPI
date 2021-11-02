@@ -1,6 +1,6 @@
-const Sequelize = require("sequelize");
+const {Pool, Client} = require('pg')
 
-const sequelize = new Sequelize({
+const pool = new Pool({
   host: 'localhost',
   dialect: 'postgres',
   password: '',
@@ -10,69 +10,58 @@ const sequelize = new Sequelize({
   logging: false
 });
 
-const Reviews = sequelize.define('reviews', {
-  id: {type: Sequelize.INTEGER, primaryKey: true},
-  product_id: Sequelize.INTEGER,
-  rating: Sequelize.INTEGER,
-  date: Sequelize.BIGINT,
-  summary: Sequelize.TEXT,
-  body: Sequelize.TEXT,
-  recommend: Sequelize.BOOLEAN,
-  reported: Sequelize.BOOLEAN,
-  reviewer_name: Sequelize.STRING,
-  reviewer_email: Sequelize.STRING,
-  response: Sequelize.STRING,
-  helpfulness: Sequelize.INTEGER
-});
 
-const Photos = sequelize.define('review_photos', {
-  id: {type: Sequelize.INTEGER, primaryKey: true},
-  review_id: {
-    type: Sequelize.INTEGER,
-    references: {
-      // This is a reference to another model
-      model: Reviews,
-      // This is the column name of the referenced model
-      key: 'id',
-      // This declares when to check the foreign key constraint. PostgreSQL only.
-      deferrable: Sequelize.Deferrable.INITIALLY_IMMEDIATE
+const getReviews = function(options, cb) {
+  //use options obj arg to structure query
+
+  // `SELECT ${columns} FROM reviews
+  // INNER JOIN review_photos ON review_photos.review_id = reviews.review_id
+  // WHERE reviews.product_id = ${options.productId}`
+
+  let columns = 'reviews.review_id, rating, date, summary, body, recommend, reported, reviewer_name, response, helpfulness'
+
+  pool.query(`SELECT * FROM review_photos
+    WHERE review_photos.review_id = 5`, (err, res) => {
+      if (err) {
+      console.log('SELECT pool.query() Error:', err)
+      cb(err, null);
     }
-  },
-  url: Sequelize.TEXT,
-});
-
-const Characteristics = sequelize.define('characteristics', {
-  id: {type: Sequelize.INTEGER, primaryKey: true},
-  product_id: {type: Sequelize.INTEGER, primaryKey: true},
-  name: Sequelize.STRING
-});
-
-const CharacteristicVals = sequelize.define('characteristic_reviews', {
-  id: {type: Sequelize.INTEGER, primaryKey: true},
-  characteristic_id: {
-    type: Sequelize.INTEGER,
-    references: {
-      // This is a reference to another model
-      model: Characteristics,
-      // This is the column name of the referenced model
-      key: 'id',
-      // This declares when to check the foreign key constraint. PostgreSQL only.
-      deferrable: Sequelize.Deferrable.INITIALLY_IMMEDIATE
+    if (res) {
+      cb(null, res.rows);
     }
-  },
-  review_id: {
-    type: Sequelize.INTEGER,
-    references: {
-      // This is a reference to another model
-      model: Reviews,
-      // This is the column name of the referenced model
-      key: 'id',
-      // This declares when to check the foreign key constraint. PostgreSQL only.
-      deferrable: Sequelize.Deferrable.INITIALLY_IMMEDIATE
+  })
+}
+
+const getMeta = function(options, cb) {
+  let columns = 'review_id, rating, date, summary, body, recommend, reported, reviewer_name, response, helpfulness'
+  let result = {}
+  pool.query(`SELECT ${columns} FROM reviews WHERE reviews.product_id = ${options.productId} `, (err, res) => {
+    if (err) {
+      console.log('SELECT pool.query() Error:', err)
+      cb(err, null);
     }
-  },
-  value: Sequelize.INTEGER,
-});
+    if (res) {
+      cb(null, res);
+      result = res;
+    }
+  })
 
+  //get ratings with aggregation fx
+  //get recommended with aggregation fx
+  //get characteristics with id and value aggregation calculation
 
-module.exports = {sequelize, Reviews, Photos, Characteristics, CharacteristicVals};
+};
+
+const postReview = function(options, cb) {
+  return 'postReview';
+};
+
+const putHelpful = function(options, cb) {
+  return 'putHelpful';
+};
+
+const reportReview = function(options, cb) {
+  return 'reportReview';
+};
+
+module.exports = {getReviews};

@@ -7,7 +7,6 @@ const app = express();
 const port = 3000;
 const query = require('./../database/queries');
 const db = require('./../database/db');
-const dbTwo = require('./../database/dbTwo');
 
 app.use(express.static('Public'));
 app.use(express.json());
@@ -18,9 +17,6 @@ app.get('/', (req, res) => {
 });
 
 app.get('/reviews/', (req, res) => {
-
-  //pull id a page parameters into options obj
-
   let queryOptions = {
     productId: req.query.product_id,
     count: req.query.count,
@@ -30,7 +26,7 @@ app.get('/reviews/', (req, res) => {
 
   console.log("parameters", queryOptions);
 
-  dbTwo.test(queryOptions, (err, data) => {
+  db.getReviews(queryOptions, (err, data) => {
     if (err) {
       res.status(500).json("Error retrieving review data.")
     } else {
@@ -115,15 +111,5 @@ app.put('/reviews/:review_id/report', (req, res) => {
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
-
-async function dbTest() {
-  try {
-    await db.sequelize.authenticate();
-    console.log('Connection has been established successfully.');
-  } catch (error) {
-    console.error('Unable to connect to the database:', error);
-  }
-}
-dbTest();
 
 module.exports = app;
