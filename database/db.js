@@ -24,8 +24,6 @@ const pool = new Pool({
 });
 
 const getReviews = function(options, cb) {
-  //use options obj arg to structure query
-  let reviews = `SELECT * FROM reviews WHERE product_id = ${options.productId}`;
   let join = `SELECT * FROM review_photos
   RIGHT JOIN reviews ON review_photos.review_id = reviews.review_id
   WHERE reviews.product_id = ${options.productId}`
@@ -49,59 +47,6 @@ const getReviews = function(options, cb) {
         throw error;
         console.log("Error retrieving reviews from db.")
     });
-
-    // for(var i = 0; i < data.length; i++) {
-    //   console.log(data[i].review_id)
-    //   db.any(`SELECT * FROM review_photos WHERE review_id = ${data[i].review_id}`)
-    //     .then((imgs) => {
-    //       photos[i] = imgs;
-    //     }) .catch(function(error) {
-    //       throw error;
-    //       console.log("Error retrieving reviews from db.")
-    //   });
-    // };
-
-
-  // pool.query(alt, (err, res) => {
-  //     if (err) {
-  //     console.log('SELECT pool.query() Error:', err)
-  //     cb(err, null);
-  //   }
-  //   if (res) {
-
-  //     cb(null, res.rows);
-  //   }
-  // })
-
-
-};
-
-const getPhotos = function(options, cb) {
-  //use options obj arg to structure query
-  let join = `SELECT * FROM review_photos
-  RIGHT JOIN reviews ON review_photos.review_id = reviews.review_id
-  WHERE reviews.product_id = ${options.productId}`
-
-  let alt = `SELECT * FROM reviews
-  LEFT OUTER JOIN review_photos ON review_photos.review_id = reviews.review_id
-  WHERE reviews.product_id = ${options.productId}`
-
-  let reviews = `SELECT reported FROM reviews WHERE review_id = 4`
-  let photos
-
-  let index = 'CREATE INDEX idx_reviews_id ON review_photos(review_id)'
-
-  pool.query(alt, (err, res) => {
-      if (err) {
-      console.log('SELECT pool.query() Error:', err)
-      cb(err, null);
-    }
-    if (res) {
-
-      cb(null, res.rows);
-    }
-  })
-
 
 };
 
