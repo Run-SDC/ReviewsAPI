@@ -31,7 +31,31 @@ app.get('/reviews/', (req, res) => {
       res.status(500).json("Error retrieving review data.")
     } else {
       console.log("data from server file", data);
-      res.status(200).json(data)
+
+      var compiledReviews = {};
+
+      for (var i = 0; i < data.length; i++) {
+        console.log(data[i].review_id)
+        if (!(data[i].review_id in compiledReviews)) {
+          compiledReviews[data[i].review_id] = data[i]
+        }
+        else {
+          compiledReviews[data[i].review_id].photos.push(data[i].photos[0]);
+        }
+      }
+
+      let reviews = {
+        product: req.query.product_id,
+        count: req.query.count,
+        page: req.query.page,
+        results: []
+      }
+
+      for (var review in compiledReviews) {
+        reviews.results.push(compiledReviews[review]);
+      }
+
+      res.status(200).json(reviews)
     }
   })
 })
@@ -55,9 +79,6 @@ app.get('/meta', (req, res) => {
 })
 
 app.post('/reviews', (req, res) => {
-  //helper function from db to add new entry
-  let reviewData = req.body;
-  console.log(reviewData);
   //DATA FROM CLIENT
   // const params = {
   //   // eslint-disable-next-line camelcase
@@ -72,15 +93,14 @@ app.post('/reviews', (req, res) => {
   //   characteristics: S.characteristics
   // };
 
-  // db.postReview(req.body, (err, data) => {
-  //   if (err) {
-  //     throw error;
-  //     res.status(500).json("Error updating review.")
-  //   } else {
-  //     console.log("Successfully added review");
-  //     res.status(204).json('CREATED')
-  //   }
-  // })
+  db.postReview(req.body, (err, data) => {
+    if (err) {
+      res.status(500).json("Error updating review.")
+    } else {
+      console.log("Successfully added review");
+      res.status(204).json('CREATED')
+    }
+  })
 })
 
 app.put('/reviews/:review_id/helpful', (req, res) => {

@@ -1,5 +1,17 @@
 
+const pgp = require('pg-promise')();
 
+const connect = {
+  host: 'localhost',
+  dialect: 'postgres',
+  password: '',
+  user: 'josh',
+  port: 5432,
+  database: 'reviews',
+  logging: false
+}
+
+const db = pgp(connect);
 
 
 const compilePhotos() {
