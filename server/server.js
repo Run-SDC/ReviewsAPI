@@ -16,7 +16,7 @@ app.get('/', (req, res) => {
   res.status(200).json('Server is running...');
 });
 
-app.get('/reviews/', (req, res) => {
+app.get('/reviews', (req, res) => {
   let queryOptions = {
     productId: req.query.product_id,
     count: req.query.count,
@@ -60,23 +60,27 @@ app.get('/reviews/', (req, res) => {
   })
 })
 
-app.get('/meta', (req, res) => {
+app.get('/reviews/meta', (req, res) => {
   //helper function from db to pull meta data for a products reviews
-  console.log(query.getMeta());
 
-  res.status(200).send('pinged reviews/meta router')
+  let queryOptions = {
+    productId: req.query.product_id,
+  }
 
-  query.getMeta()
-  .then((metaData) => {
-    res.status(200).json(metaData)
-    return
-  })
-  .catch((err) => {
-    throw error
-    res.status(500).json('Server error', error);
-  })
+  console.log("pinged meta router")
 
-})
+  db.getMeta(queryOptions, (err, data) => {
+      if (err) {
+        res.status(500).json("Error retrieving review/meta data.")
+      } else {
+        console.log("data from meta query", data);
+        res.status(200).send(data)
+
+      }
+    });
+
+})  ;
+
 
 app.post('/reviews', (req, res) => {
   //DATA FROM CLIENT
@@ -104,7 +108,6 @@ app.post('/reviews', (req, res) => {
 })
 
 app.put('/reviews/:review_id/helpful', (req, res) => {
-
   let queryOptions = {
     reviewId: req.params.review_id,
   }

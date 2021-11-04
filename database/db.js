@@ -32,7 +32,6 @@ const getReviews = function(options, cb) {
 
   db.any(join,)
     .then(function(data) {
-      console.log('Data from promise library', data)
 
       for(var i = 0; i < data.length; i++) {
         let photo = {id:data[i].id, url: data[i].url};
@@ -40,7 +39,6 @@ const getReviews = function(options, cb) {
         delete data[i].id;
         delete data[i].url;
       }
-      console.log('Data from promise library', data)
       cb(null,data);
     })
     .catch(function(error) {
@@ -51,18 +49,49 @@ const getReviews = function(options, cb) {
 };
 
 const getMeta = function(options, cb) {
-  let columns = 'review_id, rating, date, summary, body, recommend, reported, reviewer_name, response, helpfulness'
-  let result = {}
-  pool.query(`SELECT ${columns} FROM reviews WHERE reviews.product_id = ${options.productId} `, (err, res) => {
-    if (err) {
-      console.log('SELECT pool.query() Error:', err)
-      cb(err, null);
-    }
-    if (res) {
-      cb(null, res);
-      result = res;
-    }
-  })
+
+  console.log('productId within meta', options.productId);
+
+  let meta = `select * from characteristics c
+    RIGHT JOIN characteristic_reviews cr on c.id = cr.characteristic_id
+    WHERE c.product_id = 4`;
+
+  let ratings= `SELECT ROUND( AVG( rating ), 2 ) rating FROM reviews
+  WHERE reviews.product_id = ${options.productId}`;
+
+  db.any(meta)
+    .then(function(data) {
+      for(var i = 0; i < data.length; i++) {
+        delete data[i].id;
+        delete data[i].product_id;
+      }
+      // console.log('Data from meta query', data)
+
+      // cb(null,data);
+      return data
+    })
+    .then((meta) => {
+      db.any(ratings)
+        .then((rating) => {
+          console.log(meta, rating);
+          let result = {rating: rating, characteristics: meta}
+          cb(null, result);
+        })
+        .catch(function(error) {
+          throw error;
+          console.log("Error retrieving meta from db.")
+      });
+    })
+    .catch(function(error) {
+        throw error;
+        console.log("Error retrieving meta from db.")
+    });
+
+
+
+
+
+
 };
 
 const postReview = function(options, cb) {
@@ -110,4 +139,4 @@ const reportReview = function(options, cb) {
   })
 };
 
-module.exports = {getReviews, reportReview, putHelpful, postReview};
+module.exports = {getReviews, reportReview, putHelpful, postReview, getMeta};
