@@ -1,10 +1,11 @@
 const {Pool, Client} = require('pg')
 const pgp = require('pg-promise')();
+const credentials = require('../credentials.js');
 
 const connect = {
   host: 'localhost',
   dialect: 'postgres',
-  password: '',
+  password: credentials.dbPassword,
   user: 'josh',
   port: 5432,
   database: 'reviews',
@@ -13,29 +14,22 @@ const connect = {
 
 const db = pgp(connect);
 
-const pool = new Pool({
-  host: 'localhost',
-  dialect: 'postgres',
-  password: '',
-  user: 'josh',
-  port: 5432,
-  database: 'reviews',
-  logging: false
-});
-
 const getReviews = function(options, cb) {
   let join = `SELECT * FROM review_photos
   RIGHT JOIN reviews ON review_photos.review_id = reviews.review_id
   WHERE reviews.product_id = ${options.productId}`
 
-  let index = 'CREATE INDEX idx_reviews_id ON review_photos(review_id)'
+  let metrics = `EXPLAIN ANALYZE SELECT * FROM review_photos
+  RIGHT JOIN reviews ON review_photos.review_id = reviews.review_id
+  WHERE reviews.product_id = ${options.productId}`
 
-  db.any(join,)
+  db.any(join)
     .then(function(data) {
 
       for(var i = 0; i < data.length; i++) {
         let photo = {id:data[i].id, url: data[i].url};
         data[i].photos = [photo]
+
         delete data[i].id;
         delete data[i].url;
       }
@@ -52,11 +46,11 @@ const getMeta = function(options, cb) {
 
   console.log('productId within meta', options.productId);
 
-  let meta = `select * from characteristics c
+  let meta = `SELECT * from characteristics c
     RIGHT JOIN characteristic_reviews cr on c.id = cr.characteristic_id
     WHERE c.product_id = 4`;
 
-  let ratings= `SELECT ROUND( AVG( rating ), 2 ) rating FROM reviews
+  let ratings= `SELECT rating FROM reviews
   WHERE reviews.product_id = ${options.productId}`;
 
   db.any(meta)
@@ -75,6 +69,7 @@ const getMeta = function(options, cb) {
         .then((rating) => {
           console.log(meta, rating);
           let result = {rating: rating, characteristics: meta}
+
           cb(null, result);
         })
         .catch(function(error) {
@@ -86,16 +81,10 @@ const getMeta = function(options, cb) {
         throw error;
         console.log("Error retrieving meta from db.")
     });
-
-
-
-
-
-
 };
 
 const postReview = function(options, cb) {
-  let insert = `INSERT INTO reviews
+  let insert = `EXPLAIN ANALYZE INSERT INTO reviews
     (product_id, rating, date, body, recommend, reported, reviewer_name, reviewer_email, response, helpfulness)
     VALUES (${options.product_id}, ${options.rating}, ${Date.now()}, ${options.body}, ${options.recommend}, ${false}, ${options.name}, ${options.email}, ${null}, ${0})`
 
@@ -126,7 +115,7 @@ const putHelpful = function(options, cb) {
 };
 
 const reportReview = function(options, cb) {
-  let report = `UPDATE reviews SET reported = true WHERE review_id = ${options.reviewId}`
+  let report = `Explain Analyze UPDATE reviews SET reported = true WHERE review_id = ${options.reviewId}`
 
   pool.query(report, (err, res) => {
     if (err) {

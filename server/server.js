@@ -5,7 +5,6 @@
 const express = require('express');
 const app = express();
 const port = 3000;
-const query = require('./../database/queries');
 const db = require('./../database/db');
 
 app.use(express.static('Public'));
@@ -24,18 +23,17 @@ app.get('/reviews', (req, res) => {
     sort: req.query.sort
   }
 
-  console.log("parameters", queryOptions);
+  // console.log("parameters", queryOptions);
 
   db.getReviews(queryOptions, (err, data) => {
     if (err) {
       res.status(500).json("Error retrieving review data.")
     } else {
-      console.log("data from server file", data);
+      // console.log("data from server file", data);
 
       var compiledReviews = {};
 
       for (var i = 0; i < data.length; i++) {
-        console.log(data[i].review_id)
         if (!(data[i].review_id in compiledReviews)) {
           compiledReviews[data[i].review_id] = data[i]
         }
